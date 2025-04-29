@@ -31,6 +31,11 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             FantasyBooksSeeder::class,
+            SelfHelpBooksSeeder::class,
+            EducationBooksSeeder::class,
+            MathBooksSeeder::class,
+            CodingBooksSeeder::class,
+            ScienceBooksSeeder::class,
         ]);
     }
 }
