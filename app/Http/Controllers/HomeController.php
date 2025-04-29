@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Resource;
 use App\Models\Category;
+use App\Models\User;
 
 class HomeController extends Controller
 {
@@ -68,29 +70,25 @@ class HomeController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $user = Auth::user();
-
-        // Ensure $user is an Eloquent model
-        if (!($user instanceof \Illuminate\Database\Eloquent\Model)) {
-            // Retrieve the user model from the database
-            $user = \App\Models\User::find(Auth::id());
-        }
-
+        $user = User::find(Auth::id());
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        if (!empty($validated['password'])) {
-            $user->password = bcrypt($validated['password']);
-        }
-        
         $user->name = $validated['name'];
         $user->email = $validated['email'];
+        
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
         $user->save();
 
-        return redirect()->route('profile')->with('success', 'Profile updated successfully');
+        return redirect()->route('profile')
+            ->with('success', 'Profile updated successfully');
     }
 
     public function notifications()
